@@ -7,6 +7,22 @@ download.py downloads all necessary static data from the webs if necessary.
 
 import os
 import requests
+import json
+import pandas as pd
+
+def clean_citibike_stations_data():
+    # Read in raw file. Save the 'stationBeanList' information as a pandas DF.
+    with open('../../data/citibike/citibike_stations_raw.json') as f:
+        df = pd.DataFrame(json.load(f)['stationBeanList'])
+
+    # Drop columns that are useless.
+    drop_cols = []
+    for col in df:
+        if df[col].unique()[0] == 1:
+            drop_cols.append(col)
+
+    df = df.drop(columns=drop_cols)
+    df.to_csv('../../data/citibike/citibike_stations.json')
 
 def main():
     """
@@ -33,5 +49,10 @@ def main():
         else:
             print("Skip.. I have the data.")
 
+    if os.path.exists('../../data/citibike/citibike_stations_raw.json'):
+        clean_citibike_stations_data()
+    else:
+        print('... Raw citibike data not found.')
+        raise FileNotFoundError
 if __name__ == '__main__':
     main()
