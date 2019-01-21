@@ -24,35 +24,47 @@ def clean_citibike_stations_data():
     df = df.drop(columns=drop_cols)
     df.to_csv('../../data/citibike/citibike_stations.json')
 
-def main():
-    """
-    Aggregate
-    """
-    # Get root of data directory.
-    data_root = '../../data/'
-    
-    # List of necessary downloads.
-    data_urls = ['http://web.mta.info/developers/data/nyct/subway/Stations.csv', 
-                 'https://feeds.citibikenyc.com/stations/stations.json'] 
-    
-    # Parallel list for where to download the data.
-    # FIXME (MDH): Possibly use a more general method for absolute path.
-    data_fns = [data_root + fn for fn in ['mta/mta_stations.csv',
-                                          'citibike/citibike_stations_raw.json']]
+def citibike_station(data_root):
+    url = 'https://feeds.citibikenyc.com/stations/stations.json'
+    fn = '../../data/citibike/citibike_stations_raw.json'
 
-    # Downloads of each test.
-    for url, fn in zip (data_urls, data_fns):
-        if not os.path.exists(fn):
-            r = requests.get(url)
-            with open(fn, 'wb') as f:
-                f.write(r.content)
-        else:
-            print("Skip.. I have the data.")
-
-    if os.path.exists('../../data/citibike/citibike_stations_raw.json'):
+    if not os.path.exists(fn):
+        print('Downloading Citibike station data.')
+        r = requests.get(url)
+        with open(fn, 'wb') as f:
+            f.write(r.content)
+        print('Cleaning Citibike data.')
         clean_citibike_stations_data()
     else:
-        print('... Raw citibike data not found.')
-        raise FileNotFoundError
+        print('(Skipping) Downloading Citibike station data.')
+
+def mta_stations(data_root):
+    
+    data_urls = 'http://web.mta.info/developers/data/nyct/subway/Stations.csv'
+    fn  = data_root + 'mta/mta_stations.csv'
+    if not os.path.exists(fn):
+        r = requests.get(url)
+        with open(fn, 'wb') as f:
+            f.write(r.content)
+    else:
+        print("(Skipping) Downloading MTA station data.")
+        
+def mta(data_root):
+    mta_stations(data_root)
+        
+def citibike(data_root):
+    citibike_station(data_root)
+
+def main():
+    """
+    Collect and clean the necessary data.
+    """
+
+    
+    # Get root of data directory.
+    data_root = '../../data/'
+    mta(data_root)
+    citibike(data_root)
+        
 if __name__ == '__main__':
     main()

@@ -1,3 +1,6 @@
+# Large Datasets.
+data/citibike/dock_historical/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
