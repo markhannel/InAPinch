@@ -12,3 +12,17 @@ reasonable estimates.
 To learn about the historical MTA Data source:
 http://web.mta.info/developers/MTA-Subway-Time-historical-data.html
 
+General MTA information (Incomplete):
+- http://web.mta.info/developers/developer-data-terms.html#data
+
+MTA Subway data sources:
+- Historical subway arrival data: http://web.mta.info/developers/data/archives.html
+
+
+MTA Bus data sources:
+- Historical bus arrival data: https://www.theopenbus.com/raw-data.html
+
+Motivate (Citi Bike) data sources:
+- Historical station occupancy data https://www.theopenbus.com/raw-data.html
+
+NYC Ferry data sources:
