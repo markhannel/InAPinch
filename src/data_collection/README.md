@@ -1,7 +1,7 @@
 # Data Collection.
 
-Data collection is tantamount to this project! To provide statically-backed
-route estimation that incorporates multiple modes of transportation, we
+Data collection is tantamount to this project! To provide statistically-backed
+route reccomendations that incorporates multiple modes of transportation, we
 will require the following data for each mode of transport:
 - geospatial information (where is each **active** station)
 - historical trip information (how long does each trip take, how long is the wait period at this location).
