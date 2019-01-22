@@ -1,0 +1,48 @@
+﻿stop_id,stop_code,stop_name,stop_lat,stop_lon
+4,2319806,"Hunters Point South",40.741849,-73.961354
+8,2319809,"South Williamsburg",40.708571,-73.970231
+11,2319817,"Atlantic Ave/BBP Pier 6",40.692402,-74.002303
+16,,"Beach Channel Dr/B. 108th St",40.583846,-73.831658
+17,2319805,"East 34th Street",40.743947,-73.970706
+18,2319807,"Greenpoint",40.731365,-73.963617
+19,2319808,"North Williamsburg",40.720875,-73.964928
+20,2319810,"Dumbo/BBP Pier 1",40.703540,-73.995763
+23,2319815,"Bay Ridge",40.639969,-74.038180
+24,2319816,"Red Hook/Atlantic Basin",40.681036,-74.013173
+25,2319819,"Roosevelt Island",40.756854,-73.952491
+37,,"Beach Channel Dr/B. 54th St",40.595183,-73.784752
+39,,"Rockaway Beach Blvd/B. 86th St",40.587708,-73.811105
+48,,"Rockaway Point Blvd/B. 169th St",40.567116,-73.882607
+49,,"Jacob Riis Park Road/Bath House",40.566157,-73.872477
+50,,"Rockaway Beach Blvd/ B. 149th St",40.569285,-73.863808
+51,,"Rockaway Beach Blvd/B. 135th St",40.573879,-73.852910
+52,,"Rockaway Beach Blvd/B. 127th St",40.576657,-73.846073
+53,,"Rockaway Beach Blvd/B. 115th St",40.579947,-73.836462
+61,,"Beach Channel Dr/B. 41st St",40.595828,-73.772574
+62,,"Beach Channel Dr/B. 36th St",40.596261,-73.769134
+66,,"East 34th St & 2nd Ave",40.744949,-73.976168
+67,,"East 34th St & 3rd Ave",40.745459,-73.977750
+68,,"East 34th St & Park Ave",40.747236,-73.981553
+74,,"3rd Ave & East 34th St",40.745955,-73.978448
+81,,"East 48th St & Park Ave",40.755747,-73.974540
+82,,"Lexington Ave & East 46th St",40.754280,-73.974084
+83,,"Lexington Ave & East 42nd St",40.751339,-73.976215
+84,,"Lexington Ave & East 37th St",40.748381,-73.978367
+85,,"East 34th St & Lexington Ave",40.746155,-73.979393
+86,,"East 34th Street Ferry Terminal",40.743676,-73.971676
+87,2319811,"Wall St/Pier 11",40.703269,-74.005596
+88,2319813,"Rockaway",40.584123,-73.831855
+89,2319818,"Astoria",40.771758,-73.935777
+90,2319820,"Long Island City",40.748436,-73.957726
+103,,"Rockaway Beach Blvd & Beach 67th St",40.590691,-73.796310
+104,,"Rockaway Beach Blvd & Beach 96th St",40.585430,-73.817900
+105,,"Rockaway Beach Blvd & Beach 77th St",40.588350,-73.804470
+106,,"Madison Ave & East 37th St",40.749815,-73.981465
+107,,"Madison Ave & East 41st St",40.752068,-73.979817
+108,,"Madison Ave & East 44th St",40.754007,-73.978385
+109,,"Madison Ave & East 46th St",40.755339,-73.977428
+112,,"Soundview",40.804117,-73.848933
+113,,"East 90th St",40.777550,-73.942000
+114,,"Stuyvesant Cove",40.732114,-73.972939
+115,,"Corlears Hook",40.710149,-73.979263
+118,2319814,"Sunset Park/BAT",40.646356,-74.026547
