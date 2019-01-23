@@ -9,6 +9,13 @@ will require the following data for each mode of transport:
 - If trip length varies amongst a demographic, sufficient data to make
 reasonable estimates.
 
+# Modules.
+download.py queries the live MTA Feed and live Citibike feed to gather a list of station
+locations. Historical MTA data is collected from the MTA developer archives.
+Historical Citi Bike dock data was downloaded by hand from TheOpenBus.
+
+aggregate.py collects the data sourced from TheOpenBus.com into one file.
+
 To learn about the historical MTA Data source:
 http://web.mta.info/developers/MTA-Subway-Time-historical-data.html
 
