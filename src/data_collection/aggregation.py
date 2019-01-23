@@ -25,6 +25,10 @@ def main():
         print('working on {}.'.format(afile))
         df = df.append(pd.read_csv(afile, sep='\t'), ignore_index=True)
 
+
+    # Fix the pm debacle.
+    df.loc[df['hour'] == 12, 'pm'] = df.loc[df['hour'] == 12, 'pm'].apply(lambda x: (x+1)%2)
+        
     # Clean the data.
     df['newhour'] = (df.hour + 12*df.pm) % 24
     df['newhour'] = df['newhour'].apply(lambda x: '{:02}'.format(x))
@@ -33,6 +37,7 @@ def main():
     df.time = pd.to_datetime(df.time, format="%y-%m-%d-%H:%M")
     df = df.drop(columns=['date', 'hour', 'minute', 'pm', 'newhour', 'newmin'])
 
+    
     # Save cleaned data.
     df.to_csv(res_fn)
 
