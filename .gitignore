@@ -1,6 +1,9 @@
 # Large Datasets.
 data/citibike/dock_historical/
+
+# Todo lists.
 *todo.txt*
+
 # Ignore backups.
 *~
 
@@ -88,8 +91,8 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
-.venv
+*.env
+*.venv
 env/
 venv/
 ENV/
