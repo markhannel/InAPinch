@@ -38,7 +38,7 @@ def main():
     df['newmin'] = df.minute.apply(lambda x: '{:02}'.format(x))
     df['time'] = df['date'].astype(str) + '-' + df.newhour + ':' + df.newmin
     
-    df.time = pd.to_datetime(df.time, format="%y-%m-%d-%H:%M")
+    df.time = pd.to_datetime(df.time, format="%Y-%m-%d-%H:%M")
     df = df.drop(columns=['date', 'hour', 'minute', 'pm', 'newhour', 'newmin'])
 
     
