@@ -24,8 +24,8 @@ def add_puma(df,lat_key='latitude', lon_key='longitude', id_key='id'):
     docks = []
     for dock_id in df[id_key].unique():
         red = df[df[id_key] == dock_id].iloc[0]        
-        docks.append((shapely.geometry.Point(red[lon_key],
-                                            red[lat_key]),
+        docks.append((shapely.geometry.Point(red[lat_key],
+                                            red[lon_key]),
                       red[id_key]))
                      
     # Create dock dictionary.
