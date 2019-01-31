@@ -26,19 +26,15 @@ def main():
         df = df.append(pd.read_csv(afile, sep='\t'), ignore_index=True)
 
 
-    # Fix the pm debacle.
+    # Encode the time to be a datetime object.
     df['date'] = pd.to_datetime(df['date'], format="%y-%m-%d")
-    mask = (df.hour==12) & (df.pm==1)
-    df.loc[mask, 'date'] += pd.DateOffset(days=1)
-    df.loc[mask, 'hour'] -= 12
-    df.loc[mask, 'pm'] -= 1
-    df.loc[~mask, 'hour'] = df.loc[~mask,'hour'] + 12*df.loc[~mask, 'pm']
-
     df['newhour'] = df.hour.apply(lambda x: '{:02}'.format(x))
     df['newmin'] = df.minute.apply(lambda x: '{:02}'.format(x))
     df['time'] = df['date'].astype(str) + '-' + df.newhour + ':' + df.newmin
+    df.loc[df['pm'] == 1, 'time'] += ' PM'
+    df.loc[df['pm'] !=1, 'time'] += ' AM'
     
-    df.time = pd.to_datetime(df.time, format="%Y-%m-%d-%H:%M")
+    df.time = pd.to_datetime(df.time, format="%Y-%m-%d-%I:%M %p")
     df = df.drop(columns=['date', 'hour', 'minute', 'pm', 'newhour', 'newmin'])
 
     
