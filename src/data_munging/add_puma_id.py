@@ -25,8 +25,8 @@ def add_puma(df,lat_key='latitude', lon_key='longitude', id_key='id'):
     docks = []
     for dock_id in df[id_key].unique():
         red = df[df[id_key] == dock_id].iloc[0]        
-        docks.append((shapely.geometry.Point(red[lat_key],
-                                            red[lon_key]),
+        docks.append((shapely.geometry.Point(red[lon_key],
+                                            red[lat_key]),
                       red[id_key]))
                      
     # Create dock dictionary.
@@ -50,7 +50,7 @@ def main():
     fn = '../../data/citibike/dock_historical/historical_data_puma.csv'
     if not os.path.exists(fn):
         station_df = pd.read_csv('../../data/citibike/dock_historical/historical_data.csv', index_col=0)
-        new_station_df, new_dict = add_puma(station_df,'_long', '_lat', 'dock_id')
+        new_station_df, new_dict = add_puma(station_df,'_lat', '_lon', 'dock_id')
         new_station_df.to_csv(fn)
         with open('../../data/citibike/dock_dict_hist.pickle', "wb") as f:
             pickle.dump(new_dict, f)
@@ -58,7 +58,7 @@ def main():
     # Load live station information.
     fn = '../../data/citibike/citibike_stations_puma.csv'
     if not os.path.exists(fn):
-        station_df = pd.read_csv('../../data/citibike/citibike_stations.csv', index_col=0)
+        station_df = pd.read_csv('../../data/citibike/citibike_stations.csv', index_col=0, nrows=1000)
         new_station_df, new_dict = add_puma(station_df)
         new_station_df.to_csv(fn)
         with open('../../data/citibike/dock_dict_station.pickle', "wb") as f:
