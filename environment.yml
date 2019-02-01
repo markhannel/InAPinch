@@ -8,9 +8,9 @@ dependencies:
   - backcall=0.1.0=py36_0
   - blas=1.0=mkl
   - bleach=3.0.2=py36_0
-  - ca-certificates=2018.12.5=0
+  - ca-certificates=2018.11.29=ha4d7672_0
   - cachetools=2.1.0=py_0
-  - certifi=2018.11.29=py36_0
+  - certifi=2018.11.29=py36_1000
   - cffi=1.11.5=py36he75722e_1
   - chardet=3.0.4=py36_1
   - click=7.0=py_0
@@ -60,6 +60,7 @@ dependencies:
   - libuuid=2.32.1=h14c3975_1000
   - libxcb=1.13=h14c3975_1002
   - libxml2=2.9.8=h143f9aa_1005
+  - lightgbm=2.2.1=py36hfc679d8_0
   - markupsafe=1.1.0=py36h7b6447c_0
   - matplotlib=3.0.2=py36h8a2030e_1001
   - matplotlib-base=3.0.2=py36h167e16e_1001
@@ -74,7 +75,7 @@ dependencies:
   - notebook=5.7.4=py36_0
   - numpy=1.15.4=py36h7e9f1db_0
   - numpy-base=1.15.4=py36hde5b4d6_0
-  - openssl=1.0.2p=h14c3975_0
+  - openssl=1.0.2p=h14c3975_1002
   - osmapi=1.1.0=py_0
   - pandas=0.23.4=py36h04863e7_0
   - pandoc=2.2.3.2=0
