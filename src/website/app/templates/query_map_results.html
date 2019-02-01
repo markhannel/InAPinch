@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+
+{% block app_content %}
+<div class="container">
+
+  <div id="map" style="height: 500px;"></div>
+  <script type="text/javascript">
+  // The first parameter are the coordinates of the center of the map
+  // The second parameter is the zoom level
+  var map = L.map('map').setView([40.712, -74.006], 11);
+  
+  // {s}, {z}, {x} and {y} are placeholders for map tiles
+  // {x} and {y} are the x/y of where you are on the map
+  // {z} is the zoom level
+  // {s} is the subdomain of cartodb
+    var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+  });
+  
+  // Now add the layer onto the map
+  map.addLayer(layer);
+  // It even opens up a popup when you click it!
+  L.marker([40.677537,-73.959066]).addTo(map).bindPopup("<strong>Start Location.</strong>").openPopup();
+</script>
+</div>
+
+{% endblock %}

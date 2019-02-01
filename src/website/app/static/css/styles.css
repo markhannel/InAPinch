@@ -1,0 +1,44 @@
+
+
+/* Make sure body starts below the navbar. */
+body {
+    padding-top: 65px;
+    padding-bottom: 145px;
+    font-family: 'Lato', sans-serif;
+}
+
+@media (min-width: 992px) {
+  body {
+      padding-top: 56px;
+      padding-bottom: 145px;
+  }
+}
+
+h1 {
+    font-size: 3.0em; /* 40px/16=2.5em */
+    font-family: 'Oswald', sans-serif;
+}
+
+.h2 {
+    font-size: 2.25em; /* 30px/16=1.875em */
+}
+
+.p {
+    font-size: 1.875em !important; /* 14px/16=0.875em */
+}
+
+
+.carousel-indicators li {
+  background-color: #999;
+  background-color: rgba(70,70,70,.25);
+}
+
+.carousel .item { height: 260px; }
+
+.carousel-indicators .active {
+  background-color: #444;
+}
+
+.carousel-indicators {
+  bottom:6em;
+}
