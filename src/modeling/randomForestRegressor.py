@@ -66,7 +66,7 @@ def main():
         Y = train['avail_bikes'].values
         
         # Model for bikes.
-        bike_mdl = RandomForestRegressor(n_estimators=1000, n_jobs=-1, random_state=0)
+        bike_mdl = RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=0)
         bike_mdl.fit(X.values, Y)
 
         # Train set results.
