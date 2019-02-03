@@ -2,8 +2,15 @@
 
 
 {% block app_content %}
+<style>
+  .bottom-three {
+     margin-bottom: 1 cm;
+  }
+</style>
+
 <div class="container">
-  <h2> Enter geographic coordinates as well as the time.</h2>
+  <h1 align="center"> In-A-Pinch</h1>
+  <!--
   <form action="#" method="post">
     {{ form.hidden_tag() }}
 
@@ -23,11 +30,63 @@
     </p>
     <input type="submit"/>
   </form>
+  -->
+  
+  <p>
+    <div class="input-group">
+      <div class="input-group-prepend">
+	<span class="input-group-text">Start and Finish</span>
+      </div>
+      <input type="text" aria-label="First name" class="form-control" value="523 Prospect Place, Brooklyn NY 11238">
+      <input type="text" aria-label="Last name" class="form-control" value="1100 6th Ave New York, NY 10036">
+    </div>
+  </p>
+  <p>
+    <div class="input-group">
+      <div class="dropdown">
+	<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Start Location Examples
+	  <span class="caret"></span></button>
+	<ul class="dropdown-menu">
+	  <li><a href="#">523 Prospect Place, Brooklyn, NY 11238</a></li>
+	  <li><a href="#"></a></li>
+	</ul>
+      </div>
+    
+      <div class="dropdown">
+	<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">End Location Examples
+	  <span class="caret"></span></button>
+	<ul class="dropdown-menu">
+	  <li><a href="#">HBO</a></li>
+	  <li><a href="#">Murmurmation</a></li>
+	  <li><a href="#">Bloomberg</a></li>
+	  <li><a href="#">Simon Data</a></li>
+	  <li><a href="#">Neuberger Berman</a></li>
+	</ul>
+      </div>
+    </div>
+  </p>
+  <form action="#" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+      
+      Start Date: {{ form.dt(class='datepicker') }}
+    </p>
+    <p>
+      Start Time: {{ form.start_time }}
+    </p>
+    <input type="submit"/>
+  </form>
+  
+<p class="bottom-three">
   <div id="map" style="height: 500px;"></div>
+  </p>
+  
   <script type="text/javascript">
+
+  
   // The first parameter are the coordinates of the center of the map
   // The second parameter is the zoom level
-  var map = L.map('map').setView([40.712, -74.006], 11);
+  var map = L.map('map').setView([40.712, -74.006], 10);
   
   // {s}, {z}, {x} and {y} are placeholders for map tiles
   // {x} and {y} are the x/y of where you are on the map
@@ -39,12 +98,42 @@
   
   // Now add the layer onto the map
   map.addLayer(layer);
+  var marker = L.marker([40.677537, -73.959066]).addTo(map);
+  var marker = L.marker([40.7395441, -73.9885504]).addTo(map);
   </script>
-
+  </p>
   
-  {% if answer != 'none' %}
-    <h2>{{answer}}</h2>
-    {% endif %}
+{% if answer != 'none' %}
+<table style="width:80%" align="center">
+  <tr>
+    <th>Direction</th>
+    <th>Expected time</th>
+    <th></th>
+    <th>Now</th>
+    <th>Then</th>
+  </tr>
+  <tr>
+    <td>Walk to the citibike station at {{start_station}}</td>
+    <td>0:02:03</td>
+    <td>Bike Availability</td>
+    <td>2</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>Bike to the citibike station at {{end_station}}</td>
+    <td>0:34:23</td>
+    <td>Dock Availability</td>
+    <td>0</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Walk to your final location.</td>
+    <td>0:03:58</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+{% endif %}
 </div>
 
 {% endblock %}

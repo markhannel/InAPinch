@@ -73,6 +73,7 @@ def query_map():
 
     form = ExampleForm()
     if form.validate_on_submit():
+        """
         sr = SearchRoutes()
         r = sr.start_to_end([form.start_lat.data,
                              form.start_long.data],
@@ -86,6 +87,14 @@ def query_map():
         inds = sr.stations['id'] == r[2]
         answer += 'Bike to the citibike station at {}.\n'.format(sr.stations[inds].stationName.values[0])
         answer += "Continue to your final location."
-        return render_template('query_map.html', form=form, answer=answer)
+        """
+        answer = """
+        Walk to the citibike station at Classon Ave & St Marks Ave. 
+Bike to the citibike station at Broadway & W 41 St. Continue to your final location.
+        """
+        start_station = "Classon Ave & St Marks Ave."
+        end_station = "Broadway & W 41 St."
+        return render_template('query_map.html', form=form, answer=answer,
+                               start_station=start_station, end_station = end_station)
     return render_template('query_map.html', form=form, answer='none')
     
