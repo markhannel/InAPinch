@@ -98,8 +98,26 @@
   
   // Now add the layer onto the map
   map.addLayer(layer);
-  var marker = L.marker([40.677537, -73.959066]).addTo(map);
+
+  
+  {% if answer != 'none' %}
+  var marker = L.marker([{{ start_lat }}, -73.959066]).addTo(map);
+
+  
   var marker = L.marker([40.7395441, -73.9885504]).addTo(map);
+  
+  var pointA = new L.LatLng(40.677537, -73.959066);
+  var pointB = new L.LatLng(40.7395441, -73.9885504);
+  var pointList = [pointA, pointB];
+  
+  var firstpolyline = new L.Polyline(pointList, {
+  color: 'red',
+  weight: 3,
+  opacity: 0.5,
+  smoothFactor: 1
+});
+firstpolyline.addTo(map);
+  {% endif %}
   </script>
   </p>
   

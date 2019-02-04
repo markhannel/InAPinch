@@ -11,8 +11,13 @@ from collections import defaultdict
 import requests
 import json
 
-FN = '~/Github/InAPinch/data/citibike/citibike_stations.csv'
-ROUTES_FN = '/media/mark/TOSHIBA EXT1/Projects/InAPinch/data/citibike/all_stations_durations_docks.csv'
+FN = '~/inapinch/data/citibike/citibike_stations.csv'
+ROUTES_FN = '~/inapinch/data/citibike/all_stations_durations_docks.csv'
+
+class station(object):
+    def __init__(self):
+        pass
+        
 
 def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5001}):
     url = "http://127.0.0.1:{}/route/v1/{}/{},{};{},{}?steps=true"

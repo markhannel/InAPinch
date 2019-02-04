@@ -94,7 +94,9 @@ Bike to the citibike station at Broadway & W 41 St. Continue to your final locat
         """
         start_station = "Classon Ave & St Marks Ave."
         end_station = "Broadway & W 41 St."
+        start_lat = 40.677537
         return render_template('query_map.html', form=form, answer=answer,
-                               start_station=start_station, end_station = end_station)
+                               start_station=start_station, end_station = end_station,
+                               start_lat=start_lat)
     return render_template('query_map.html', form=form, answer='none')
     
