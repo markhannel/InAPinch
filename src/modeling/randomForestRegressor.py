@@ -33,11 +33,13 @@ def main():
         print('Working on: {}'.format(puma_fn))
 
         results = {}
+        
         # Load Data.
         puma = pd.read_csv(puma_fn, index_col=0)
         puma = puma.dropna() # drop nans.
 
         # Find a first date that satisfies an approximate 80/20 split.
+        '''
         total = puma.shape[0]
         split_date = '2018-{:02}-15'
         for i in range(1,13):
@@ -49,6 +51,19 @@ def main():
         # split on preferred date.
         train = puma[:split_date]
         test =  puma[split_date:]
+        '''
+
+        # Split test and train such that no two days have the same .
+        num_days = puma.dayofyear.unique().shape[0]
+        train_days = np.random.choice(puma.dayofyear.unique(), int(0.8*num_days), replace=False)
+        puma.loc[:, 'test'] = True
+        for day in train_days:
+            puma.loc[puma.dayofyear == day, 'test'] = False
+
+        
+        train = puma.query('test != True')
+        test  = puma.query('test == True')
+        
 
         # Naive model results.
         results['bikes_naive'] = {'rmse': rmse(train.avail_bikes, train['avail_bikes-1']),
