@@ -23,7 +23,7 @@ r = requests.get(CB_INFO_URL).json()
 STATION_INFO = pd.DataFrame(r['data']['stations'])
 
 
-@bp.route('/')
+@bp.route('/', methods=['POST','GET'])
 @bp.route('/home', methods=['POST','GET'])
 def home():
 
@@ -31,6 +31,8 @@ def home():
     if form.validate_on_submit():
         # Get latest Citi Bike info.
         cb_req = requests.get(CB_STATUS_URL).json()
+
+        
         
         # Pick a route.
         r = SR.start_to_end([form.start_lat.data,
