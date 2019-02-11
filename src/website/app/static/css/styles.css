@@ -2,15 +2,17 @@
 
 /* Make sure body starts below the navbar. */
 body {
-    padding-top: 65px;
+    margin=25px;
+    padding-top: 100px;
     padding-bottom: 145px;
     font-family: 'Lato', sans-serif;
 }
 
 @media (min-width: 992px) {
   body {
-      padding-top: 56px;
+      padding-top: 0px;
       padding-bottom: 145px;
+      padding-left: 0px;
   }
 }
 

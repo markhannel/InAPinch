@@ -17,9 +17,8 @@ ROUTES_FN = '~/inapinch/data/citibike/all_stations_durations_docks.csv'
 class station(object):
     def __init__(self):
         pass
-        
 
-def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5001}):
+def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5000}):
     url = "http://127.0.0.1:{}/route/v1/{}/{},{};{},{}?steps=true"
     url = url.format(modes[mode], mode,
                      start[0], start[1], 
@@ -139,17 +138,36 @@ class SearchRoutes(object):
 
         return get_shortest_path(graph, 'start', 'end')
 
+def extract_polylines(directions):
+    ''' Extracts directions from the OSRM feed.
+    '''
+
+    polylines = []
+    for step in directions['legs'][0]['steps']: 
+        for inter in step['intersections']: 
+            polylines.append(inter['location'][::-1])
+    return polylines
+
 def main():
+    
     sr = SearchRoutes()
 
     start_coords = [40.677537, -73.959066]
     end_coords = [40.7395441,-73.9885504]
 
-    print(sr.start_to_end(start_coords, end_coords))
+
+    start_coords = [-73.959066, 40.677537]
+    end_coords = [-73.9885504, 40.7395441]
+
+    dirs = get_directions(start_coords, end_coords, 'foot')
+    print(extract_polylines(dirs))
+
+    
+    #print(sr.start_to_end(start_coords, end_coords))
 
     end_coords = [40.7006181,-73.9607287]
     start_coords = [40.7184878,-73.9927139]
-    print(sr.start_to_end(start_coords, end_coords))
+    #print(sr.start_to_end(start_coords, end_coords))
     
 if __name__ == '__main__':
     main()
