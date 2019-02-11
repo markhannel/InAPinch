@@ -118,10 +118,10 @@
 
   
   {% if answer != 'none' %}
-  var marker = L.marker([{{ start_lat }}, -73.959066]).addTo(map);
+  var marker = L.marker([{{ start_lat }}, {{ start_lon }}]).addTo(map);
 
   
-  var marker = L.marker([40.7395441, -73.9885504]).addTo(map);
+  var marker = L.marker([{{ end_lat }}, {{ end_lon }}]).addTo(map);
   
   var pointA = new L.LatLng(40.677537, -73.959066);
   var pointB = new L.LatLng(40.7395441, -73.9885504);

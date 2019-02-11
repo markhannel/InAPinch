@@ -30,9 +30,7 @@ def home():
     form = ExampleForm()
     if form.validate_on_submit():
         # Get latest Citi Bike info.
-        cb_req = requests.get(CB_STATUS_URL).json()
-
-        
+        cb_req = requests.get(CB_STATUS_URL).json()        
         
         # Pick a route.
         r = SR.start_to_end([form.start_lat.data,
@@ -41,17 +39,26 @@ def home():
                               form.end_long.data])
 
 
+        # Walking directions to station.
+        start_station_lat = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
+        start_station_lon = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
         
-        start_station = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
-        end_station   = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
+        end_station_lat = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
+        end_station_lon = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
+        
+
+        
+        start_station_name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
+        end_station_name   = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
 
         # Get route directions.
-        
-        
-        start_lat = 40.677537
         return render_template('home.html', form=form, answer=True,
-                               start_station=start_station, end_station = end_station,
-                               start_lat=start_lat)
+                               start_station=start_station_name,
+                               end_station = end_station_name,
+                               start_lat=start_station_lat,
+                               start_lon=start_station_lon,
+                               end_lat=end_station_lat,
+                               end_lon=end_station_lon)
     return render_template('home.html', form=form, answer='none')
 
 @bp.route('/aboutme')
