@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired
 from app.main import bp
 from datetime import datetime
 import requests
-from citibike_only_copy import SearchRoutes, get_directions
+from citibike_only_copy import SearchRoutes, get_directions, extract_polylines
 import pandas as pd
 
 # Global variables for route information.
@@ -46,10 +46,19 @@ def home():
         end_station_lat = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
         end_station_lon = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
         
-
-        
         start_station_name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
         end_station_name   = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
+
+        walk_to_station = get_directions([form.start_long.data, form.start_lat.data],
+                                         [start_station_lon, start_station_lat], mode='foot')
+        bike_directions = get_directions([start_station_lon, start_station_lat],
+                                         [end_station_lon, end_station_lat], mode='cycle')
+        walk_to_destination = get_directions([end_station_lon, end_station_lat],
+                                         [form.end_long.data, form.end_lat.data], mode='foot')
+
+        station_polylines = extract_polylines(walk_to_station)
+        bike_polylines = extract_polylines(bike_directions)
+        destination_polylines = extract_polylines(walk_to_destination)
 
         # Get route directions.
         return render_template('home.html', form=form, answer=True,
@@ -58,7 +67,13 @@ def home():
                                start_lat=start_station_lat,
                                start_lon=start_station_lon,
                                end_lat=end_station_lat,
-                               end_lon=end_station_lon)
+                               end_lon=end_station_lon,
+                               station_polylines=station_polylines,
+                               bike_polylines=bike_polylines,
+                               destination_polylines=destination_polylines,
+                               station_duration = walk_to_station['duration'],
+                               bike_duration = bike_directions['duration'],
+                               destination_duration = walk_to_destination['duration'])
     return render_template('home.html', form=form, answer='none')
 
 @bp.route('/aboutme')
@@ -74,10 +89,12 @@ class ExampleForm(FlaskForm):
                        validators=[DataRequired()])
     
     start_lat = FloatField('Start Latitude',
-                           default=40.677537,
+                           default=40.670589,
+                           #default=40.677537,
                            validators=[DataRequired()])
     start_long = FloatField('Start Longitude',
-                            default=-73.959066,
+                            default=-73.9498344,
+                            #default=-73.959066,
                             validators=[DataRequired()])
     
     end_lat = FloatField('End Latitude',

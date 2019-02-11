@@ -118,22 +118,43 @@
 
   
   {% if answer != 'none' %}
+  // Start station marker.
   var marker = L.marker([{{ start_lat }}, {{ start_lon }}]).addTo(map);
 
-  
+  // End station marker.
   var marker = L.marker([{{ end_lat }}, {{ end_lon }}]).addTo(map);
-  
-  var pointA = new L.LatLng(40.677537, -73.959066);
-  var pointB = new L.LatLng(40.7395441, -73.9885504);
-  var pointList = [pointA, pointB];
-  
-  var firstpolyline = new L.Polyline(pointList, {
-  color: 'red',
-  weight: 3,
+
+  // Walking to station route.
+  var stationpolyline = new L.Polyline({{ station_polylines }}, {
+  color: 'blue',
+  weight: 5,
   opacity: 0.5,
   smoothFactor: 1
 });
-firstpolyline.addTo(map);
+  stationpolyline.addTo(map);
+  
+  
+  // Bike route.
+  var firstpolyline = new L.Polyline({{ bike_polylines }}, {
+  color: 'red',
+  weight: 5,
+  opacity: 0.5,
+  smoothFactor: 1
+});
+  firstpolyline.addTo(map);
+
+  // Walking to destination route.
+  var destinationpolyline = new L.Polyline({{ destination_polylines }}, {
+  color: 'blue',
+  weight: 5,
+  opacity: 0.5,
+  smoothFactor: 1
+});
+  destinationpolyline.addTo(map);
+
+  // Provide duration of each trip.
+
+  
   {% endif %}
   </script>
   </p>
@@ -156,25 +177,48 @@ firstpolyline.addTo(map);
   </tr>
   <tr>
     <td>Walk to the citibike station at {{start_station}}</td>
-    <td>0:02:03</td>
+    <td id="walk_to_station"></td>
     <td>Bike Availability</td>
     <td>2</td>
     <td>1</td>
   </tr>
   <tr>
     <td>Bike to the citibike station at {{end_station}}</td>
-    <td>0:34:23</td>
+    <td id="bike_to_station"></td>
     <td>Dock Availability</td>
     <td>0</td>
     <td>0</td>
   </tr>
   <tr>
     <td>Walk to your final location.</td>
-    <td>0:03:58</td>
+    <td id="walk_to_destination"></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="right">Total Time: &nbsp;</td>
+    <td id="total_duration"></td>
     <td></td>
     <td></td>
   </tr>
 </table>
+
+
+
+<script type="text/javascript">
+  function time(variable, duration){
+      var s = document.getElementById(variable);
+      s.innerHTML = moment().startOf('day').seconds(duration).format('H:mm:ss');
+  }
+  time("walk_to_station", {{ station_duration }} );
+  time("bike_to_station", {{ bike_duration }}*3./8);
+  time("walk_to_destination", {{ destination_duration }} );
+  time("total_duration", {{ destination_duration }}  + {{ bike_duration }}*3./8 + {{destination_duration }} );
+</script>
+
+
+
+
 {% endif %}
 </div>
 {% endblock %}
