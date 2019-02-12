@@ -30,6 +30,7 @@ def home():
     if form.validate_on_submit():
         # Get latest Citi Bike info.
         cb_req = requests.get(CB_STATUS_URL).json()        
+        station_update = pd.DataFrame(cb_req['data']['stations'])
         
         # Pick a route.
         r = SR.start_to_end([form.start_lat.data,
@@ -43,12 +44,18 @@ def home():
         start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
         start.long = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
         start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
+        start.bikes_avail = station_update.query('station_id == "{}"'.format(r[1])).num_bikes_available.values[0]
+        start.docks_avail = station_update.query('station_id == "{}"'.format(r[1])).num_docks_available.values[0]
+        
 
         end = Station()
         end.lat  = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
         end.long = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
         end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
+        end.docks_avail = station_update.query('station_id == "{}"'.format(r[2])).num_docks_available.values[0]
+        end.bikes_avail = station_update.query('station_id == "{}"'.format(r[2])).num_bikes_available.values[0]
 
+        
         # Directions.
         first_leg = Directions([form.start_long.data, form.start_lat.data],
                                [start.long, start.lat], mode='foot')

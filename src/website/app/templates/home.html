@@ -120,12 +120,12 @@
   {% if answer != 'none' %}
   // Start station marker.
   var marker1 = L.marker([{{ start.lat }}, {{ start.long }}]).addTo(map);
-  marker1.bindPopup("In 7 mins...<br><b>Bikes: 15</b><br>Docks: 12",  {closeOnClick: false,
+  marker1.bindPopup("In 7 mins...<br><b>Bikes: {{ start.bikes_avail }}</b><br>Docks: {{ start.docks_avail }}",  {closeOnClick: false,
   autoClose: false}).openPopup();
   
   // End station marker.
   var marker = L.marker([{{ end.lat }}, {{ end.long }}]).addTo(map);
-  marker.bindPopup("In 49 mins...<br>Bikes: 15<br><b>Docks: 12</b>",  {closeOnClick: false,
+  marker.bindPopup("In 49 mins...<br>Bikes: {{ end.bikes_avail }}<br><b>Docks: {{ end.docks_avail }}</b>",  {closeOnClick: false,
   autoClose: false}).openPopup();
 
   // Walking to station route.
@@ -183,14 +183,14 @@
     <td>Walk to the citibike station at {{ start.name }}</td>
     <td id="walk_to_station"></td>
     <td>Bike Availability</td>
-    <td>5</td>
+    <td>{{ start.bikes_avail }}</td>
     <td>4</td>
   </tr>
   <tr>
     <td>Bike to the citibike station at {{ end.name }}</td>
     <td id="bike_to_station"></td>
     <td>Dock Availability</td>
-    <td>12</td>
+    <td>{{ end.docks_avail }}</td>
     <td>12</td>
   </tr>
   <tr>
