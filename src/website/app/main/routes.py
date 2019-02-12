@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired
 from app.main import bp
 from datetime import datetime
 import requests
-from citibike_only_copy import SearchRoutes, get_directions, extract_polylines
+from citibike import SearchRoutes, get_directions, extract_polylines
 import pandas as pd
 
 # Global variables for route information.
@@ -21,7 +21,6 @@ SR = SearchRoutes()
 # Get Station information.
 r = requests.get(CB_INFO_URL).json()
 STATION_INFO = pd.DataFrame(r['data']['stations'])
-
 
 @bp.route('/', methods=['POST','GET'])
 @bp.route('/home', methods=['POST','GET'])
