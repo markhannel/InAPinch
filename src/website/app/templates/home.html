@@ -119,13 +119,17 @@
   
   {% if answer != 'none' %}
   // Start station marker.
-  var marker = L.marker([{{ start_lat }}, {{ start_lon }}]).addTo(map);
-
+  var marker1 = L.marker([{{ start.lat }}, {{ start.long }}]).addTo(map);
+  marker1.bindPopup("In 7 mins...<br><b>Bikes: 15</b><br>Docks: 12",  {closeOnClick: false,
+  autoClose: false}).openPopup();
+  
   // End station marker.
-  var marker = L.marker([{{ end_lat }}, {{ end_lon }}]).addTo(map);
+  var marker = L.marker([{{ end.lat }}, {{ end.long }}]).addTo(map);
+  marker.bindPopup("In 49 mins...<br>Bikes: 15<br><b>Docks: 12</b>",  {closeOnClick: false,
+  autoClose: false}).openPopup();
 
   // Walking to station route.
-  var stationpolyline = new L.Polyline({{ station_polylines }}, {
+  var stationpolyline = new L.Polyline({{ first_leg.polylines }}, {
   color: 'blue',
   weight: 5,
   opacity: 0.5,
@@ -135,7 +139,7 @@
   
   
   // Bike route.
-  var firstpolyline = new L.Polyline({{ bike_polylines }}, {
+  var firstpolyline = new L.Polyline({{ second_leg.polylines }}, {
   color: 'red',
   weight: 5,
   opacity: 0.5,
@@ -144,7 +148,7 @@
   firstpolyline.addTo(map);
 
   // Walking to destination route.
-  var destinationpolyline = new L.Polyline({{ destination_polylines }}, {
+  var destinationpolyline = new L.Polyline({{ third_leg.polylines }}, {
   color: 'blue',
   weight: 5,
   opacity: 0.5,
@@ -176,18 +180,18 @@
     <th>Then</th>
   </tr>
   <tr>
-    <td>Walk to the citibike station at {{start_station}}</td>
+    <td>Walk to the citibike station at {{ start.name }}</td>
     <td id="walk_to_station"></td>
     <td>Bike Availability</td>
-    <td>2</td>
-    <td>1</td>
+    <td>5</td>
+    <td>4</td>
   </tr>
   <tr>
-    <td>Bike to the citibike station at {{end_station}}</td>
+    <td>Bike to the citibike station at {{ end.name }}</td>
     <td id="bike_to_station"></td>
     <td>Dock Availability</td>
-    <td>0</td>
-    <td>0</td>
+    <td>12</td>
+    <td>12</td>
   </tr>
   <tr>
     <td>Walk to your final location.</td>
@@ -210,10 +214,10 @@
       var s = document.getElementById(variable);
       s.innerHTML = moment().startOf('day').seconds(duration).format('H:mm:ss');
   }
-  time("walk_to_station", {{ station_duration }} );
-  time("bike_to_station", {{ bike_duration }}*3./8);
-  time("walk_to_destination", {{ destination_duration }} );
-  time("total_duration", {{ destination_duration }}  + {{ bike_duration }}*3./8 + {{destination_duration }} );
+  time("walk_to_station", {{ first_leg.duration }} );
+  time("bike_to_station", {{ second_leg.duration }}*3./8);
+  time("walk_to_destination", {{ third_leg.duration }} );
+  time("total_duration", {{ first_leg.duration }}  + {{ second_leg.duration }}*3./8 + {{ third_leg.duration }} );
 </script>
 
 

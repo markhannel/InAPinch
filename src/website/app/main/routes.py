@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired
 from app.main import bp
 from datetime import datetime
 import requests
-from citibike import SearchRoutes, get_directions, extract_polylines
+from citibike import SearchRoutes, Station, Directions
 import pandas as pd
 
 # Global variables for route information.
@@ -38,41 +38,32 @@ def home():
                               form.end_long.data])
 
 
-        # Walking directions to station.
-        start_station_lat = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
-        start_station_lon = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
+        # Station information.
+        start = Station()
+        start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
+        start.long = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
+        start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
+
+        end = Station()
+        end.lat  = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
+        end.long = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
+        end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
+
+        # Directions.
+        first_leg = Directions([form.start_long.data, form.start_lat.data],
+                               [start.long, start.lat], mode='foot')
+        second_leg = Directions([start.long, start.lat], [end.long, end.lat],
+                                mode='cycle')
+        third_leg = Directions([end.long, end.lat], [form.end_long.data, form.end_lat.data],
+                               mode='foot')
         
-        end_station_lat = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
-        end_station_lon = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
-        
-        start_station_name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
-        end_station_name   = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
-
-        walk_to_station = get_directions([form.start_long.data, form.start_lat.data],
-                                         [start_station_lon, start_station_lat], mode='foot')
-        bike_directions = get_directions([start_station_lon, start_station_lat],
-                                         [end_station_lon, end_station_lat], mode='cycle')
-        walk_to_destination = get_directions([end_station_lon, end_station_lat],
-                                         [form.end_long.data, form.end_lat.data], mode='foot')
-
-        station_polylines = extract_polylines(walk_to_station)
-        bike_polylines = extract_polylines(bike_directions)
-        destination_polylines = extract_polylines(walk_to_destination)
-
-        # Get route directions.
+        # Render template with stations and directions.
         return render_template('home.html', form=form, answer=True,
-                               start_station=start_station_name,
-                               end_station = end_station_name,
-                               start_lat=start_station_lat,
-                               start_lon=start_station_lon,
-                               end_lat=end_station_lat,
-                               end_lon=end_station_lon,
-                               station_polylines=station_polylines,
-                               bike_polylines=bike_polylines,
-                               destination_polylines=destination_polylines,
-                               station_duration = walk_to_station['duration'],
-                               bike_duration = bike_directions['duration'],
-                               destination_duration = walk_to_destination['duration'])
+                               start=start, end=end,
+                               first_leg=first_leg,
+                               second_leg=second_leg,
+                               third_leg=third_leg)
+    
     return render_template('home.html', form=form, answer='none')
 
 @bp.route('/aboutme')

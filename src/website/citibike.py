@@ -14,9 +14,39 @@ import json
 FN = '~/inapinch/data/citibike/citibike_stations.csv'
 ROUTES_FN = '~/inapinch/data/citibike/all_stations_durations_docks.csv'
 
-class station(object):
+class Station(object):
+    """Station class provides a concise way to organize station data.
+    """
     def __init__(self):
-        pass
+        self.lat = None
+        self.long = None
+        self.name = None
+        self.docks_avail = None
+        self.bikes_avail = None
+        self.active = True
+        self.bikes_disabled = None
+        self.docks_disabled = None
+
+class Directions(object):
+    """ Directions class provides a concise way to organize direction
+    information.
+    """
+    def __init__(self, start, end, mode):
+        self.start = start
+        self.end = end
+        self.mode = mode
+        self.__get__directions()
+        self.__get__polylines()
+
+    def __get__directions(self):
+        self.directions = get_directions(self.start,
+                                         self.end,
+                                         self.mode)
+        self.duration = self.directions['duration']
+        
+    def __get__polylines(self):
+        self.polylines = extract_polylines(self.directions)
+    
 
 def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5000}):
     url = "http://127.0.0.1:{}/route/v1/{}/{},{};{},{}?steps=true"
