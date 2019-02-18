@@ -143,27 +143,34 @@ class SearchRoutes(object):
         
         inds = self.tree.query_ball_point(start_miles, 0.5)
         start_stations = self.stations.iloc[inds]
-        print(start_stations.stationName)
+
         inds = self.tree.query_ball_point(end_miles, 0.5)
         end_stations = self.stations.iloc[inds]
 
-        # Add walking duration from start to each of those stations.
+        # Add walking duration from start to each of rental stations.
         nodes = {}
         for _, start_row in start_stations.iterrows():
-            r = get_directions(start[::-1], start_row[['longitude', 'latitude']], 'foot')
-            nodes.update({start_row.id:r['duration']})
-            
-        graph = {'start': nodes}
+            if start[0] != start_row.latitude and start[1] != start_row.longitude:
+                r = get_directions(start[::-1], start_row[['longitude', 'latitude']], 'foot')
+                nodes.update({start_row.id:r['duration']})
 
+        # Additional node for just walking there.
+        r = get_directions(start[::-1], end[::-1], 'foot')
+        nodes.update({'end':r['duration']})
+        graph = {'start': nodes}
+        
+        # Add walking duration from each return station to the final destination.
         for _, end_row in end_stations.iterrows():
-            r = get_directions(end[::-1], end_row[['longitude', 'latitude']], 'foot')
-            graph.update({end_row.id:{'end':r['duration']}})
+            if end[0] != end_row.latitude and end[1] != end_row.longitude:
+                r = get_directions(end[::-1], end_row[['longitude', 'latitude']], 'foot')
+                graph.update({end_row.id:{'end':r['duration']}})
 
         # Add cycling directions from each "start" citibike to each "end" citibike.
         for _, start_row in start_stations.iterrows():
             nodes = {}
             for _, end_row in end_stations.iterrows():
-                nodes.update({end_row.id : self.routes.loc[start_row.id, end_row.id]['duration']})
+                if start_row.id != end_row.id:
+                    nodes.update({end_row.id : self.routes.loc[start_row.id, end_row.id]['duration']})
             graph.update({start_row.id:nodes})
 
         return get_shortest_path(graph, 'start', 'end')
