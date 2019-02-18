@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 
 {% block app_content %}
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@2.2.3/dist/esri-leaflet.js"
+	integrity="sha512-YZ6b5bXRVwipfqul5krehD9qlbJzc6KOGXYsDjU9HHXW2gK57xmWl2gU6nAegiErAqFXhygKIsWPKbjLPXVb2g=="
+	crossorigin=""></script>
+
+
+<!-- Load Esri Leaflet Geocoder from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.css"
+      integrity="sha512-v5YmWLm8KqAAmg5808pETiccEohtt8rPVMGQ1jA6jqkWVydV5Cuz3nJ9fQ7ittSxvuqsvI9RSGfVoKPaAJZ/AQ=="
+      crossorigin="">
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js"
+	integrity="sha512-zdT4Pc2tIrc6uoYly2Wp8jh6EPEWaveqqD3sT0lf5yei19BC1WulGuh5CesB0ldBKZieKGD7Qyf/G0jdSe016A=="
+	crossorigin=""></script>
 
 <style>
   .extendfull, .extendleft
@@ -15,10 +28,12 @@
   .space-title {
   padding-top: 150px;
   }
+
+  
 </style>
 <p>
 
-  </p>
+</p>
 <div class="container-fluid">
   
   <div class="row">
@@ -34,52 +49,16 @@
       <p>
 	<h4 align="center">Reliably predicting bike and dock availability <br />for sensible Citi Bike route planning.</h4>
 	</p>
-  <p class="space-above">
-    <div class="input-group">
-      <div class="input-group-prepend">
-	<span class="input-group-text">Start</span>
-      </div>
-      <input type="text" aria-label="First name" class="form-control" value="523 Prospect Place, Brooklyn NY 11238">
-    </div>
-    <div class="input-group">
-      <div class="dropdown">
-	<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Start Location Examples
-	  <span class="caret"></span></button>
-	<ul class="dropdown-menu">
-	  <li><a href="#">523 Prospect Place, Brooklyn, NY 11238</a></li>
-	  <li><a href="#"></a></li>
-	</ul>
-      </div>
-      
-  </p>
-  
-      <p>
-      <div class="input-group">
-	<div class="input-group-prepend">
-	  <span class="input-group-text">End</span>
-	</div>
-	<input type="text" aria-label="Last name" class="form-control" value="1100 6th Ave New York, NY 10036">
-      </div>
-  </p>
-
-  <p>
-    
-      <div class="dropdown">
-	<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">End Location Examples
-	  <span class="caret"></span></button>
-	<ul class="dropdown-menu">
-	  <li><a href="#">HBO</a></li>
-	  <li><a href="#">Murmurmation</a></li>
-	  <li><a href="#">Bloomberg</a></li>
-	  <li><a href="#">Simon Data</a></li>
-	  <li><a href="#">Neuberger Berman</a></li>
-	</ul>
-      </div>
-    </div>
-      
+      <p class="space-above">
       <form action="#" method="post">
 	
 	{{ form.hidden_tag() }}
+	<input type="hidden" id="start_lat" name="start_lat"></input>
+	<input type="hidden" id="start_long" name="start_long"></input>
+	<input type="hidden" id="end_lat" name="end_lat"></input>
+	<input type="hidden" id="end_long" name="end_long"></input>
+	
+	<input type="hidden" id="destination_latlng"></input>
 	<!--
 	<p>
 	  Start Date: {{ form.dt(class='datepicker') }}
@@ -98,34 +77,82 @@
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
-  
-  
-  // The first parameter are the coordinates of the center of the map
-  // The second parameter is the zoom level
-  var map = L.map('map').setView([40.753, -74.000], 12);
-  
-  // {s}, {z}, {x} and {y} are placeholders for map tiles
-  // {x} and {y} are the x/y of where you are on the map
-  // {z} is the zoom level
-  // {s} is the subdomain of cartodb
-    var layer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+  // Create Map.
+  var map = L.map('map', { zoomControl: false} ).setView([40.753, -74.000], 12);
+
+  // Add Layer with tiles.
+  var layer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
   });
   
   // Now add the layer onto the map
   map.addLayer(layer);
 
+  // Add zoom control to the bottom left.
+  L.control.zoom({
+  position:'bottomleft'
+  }).addTo(map);
+
+  // Search control for starting address.
+  var searchControl = L.esri.Geocoding.geosearch({expanded:true,
+  placeholder:'Starting Address',
+  'zoomToResult':false,
+  'useMapBounds':12,
+  'collapseAfterResult':false}).addTo(map);
+
+  // Search control for destination address on a separate corner to avoid overlap.
+  var searchControl2 = L.esri.Geocoding.geosearch({expanded:true,
+  placeholder:'Destination Address',
+  position:'topright',
+  'zoomToResult':false,
+  'useMapBounds':12,
+  'collapseAfterResult':false}).addTo(map);
+
+  // Pin results.
+  var start_results = L.layerGroup().addTo(map);
+  var dest_results = L.layerGroup().addTo(map);
+
+  
+  function resultsToHiddenField(variable, result){
+  var s = document.getElementById(variable);
+  s.value = result;
+  console.log(s.value);
+  }   
+  
+  // Search events.
+  searchControl2.on('results', function(data){
+  dest_results.clearLayers();
+  // Populate hidden form with lat long name.
+  resultsToHiddenField("end_lat", data.results[0].latlng.lat);
+  resultsToHiddenField("end_long", data.results[0].latlng.lng);
+  
+    for (var i = data.results.length - 1; i >= 0; i--) {
+      dest_results.addLayer(L.marker(data.results[i].latlng));
+    }
+  });
+
+  
+  searchControl.on('results', function(data){
+  start_results.clearLayers();
+  
+  resultsToHiddenField("start_lat", data.results[0].latlng.lat);
+  resultsToHiddenField("start_long", data.results[0].latlng.lng);
+    for (var i = data.results.length - 1; i >= 0; i--) {
+      start_results.addLayer(L.marker(data.results[i].latlng,));
+    }
+  });
   
   {% if answer != 'none' %}
   // Start station marker.
   var marker1 = L.marker([{{ start.lat }}, {{ start.long }}]).addTo(map);
-  marker1.bindPopup("In 7 mins...<br><b>Bikes: {{ start.bikes_avail }}</b><br>Docks: {{ start.docks_avail }}",  {closeOnClick: false,
+  marker1.bindPopup("In 7 mins...<br><b>Bikes: {{ start.bikes_avail_future }}</b><br>Docks: {{ start.docks_avail_future }}",  {closeOnClick: false,
   autoClose: false}).openPopup();
   
   // End station marker.
   var marker = L.marker([{{ end.lat }}, {{ end.long }}]).addTo(map);
-  marker.bindPopup("In 49 mins...<br>Bikes: {{ end.bikes_avail }}<br><b>Docks: {{ end.docks_avail }}</b>",  {closeOnClick: false,
+  marker.bindPopup("In 49 mins...<br>Bikes: {{ end.bikes_avail_future }}<br><b>Docks: {{ end.docks_avail_future }}</b>",  {closeOnClick: false,
   autoClose: false}).openPopup();
 
   // Walking to station route.
@@ -166,10 +193,11 @@
 {% if answer != 'none' %}
 
 
-      <div class="space-above">
+<div class="space-above">
+  <!-- Slider to adjust walking speed.
       <span id="valBox"></span>
       <input type="range" min="5" max="10" step="1" 
-	     oninput="showVal(this.value)" onchange="showVal(this.value)">
+	     oninput="showVal(this.value)" onchange="showVal(this.value)"> -->
       </div>
 <table style="width:80%" align="center">
   <tr>
@@ -184,14 +212,14 @@
     <td id="walk_to_station"></td>
     <td>Bike Availability</td>
     <td>{{ start.bikes_avail }}</td>
-    <td>4</td>
+    <td>{{ start.bikes_avail_future }}</td>
   </tr>
   <tr>
     <td>Bike to the citibike station at {{ end.name }}</td>
     <td id="bike_to_station"></td>
     <td>Dock Availability</td>
     <td>{{ end.docks_avail }}</td>
-    <td>12</td>
+    <td>{{ end.docks_avail_future }}</td>
   </tr>
   <tr>
     <td>Walk to your final location.</td>

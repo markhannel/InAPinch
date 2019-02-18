@@ -39,6 +39,7 @@ def home():
                               form.end_long.data])
 
 
+
         # Station information.
         start = Station()
         start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
@@ -46,6 +47,10 @@ def home():
         start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
         start.bikes_avail = station_update.query('station_id == "{}"'.format(r[1])).num_bikes_available.values[0]
         start.docks_avail = station_update.query('station_id == "{}"'.format(r[1])).num_docks_available.values[0]
+
+        # Naive Model.
+        start.bikes_avail_future = start.bikes_avail
+        start.docks_avail_future = start.docks_avail
         
 
         end = Station()
@@ -54,6 +59,10 @@ def home():
         end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
         end.docks_avail = station_update.query('station_id == "{}"'.format(r[2])).num_docks_available.values[0]
         end.bikes_avail = station_update.query('station_id == "{}"'.format(r[2])).num_bikes_available.values[0]
+
+        # Naive model.
+        end.bikes_avail_future = end.bikes_avail
+        end.docks_avail_future = end.docks_avail
 
         
         # Directions.
@@ -95,8 +104,8 @@ class ExampleForm(FlaskForm):
                             validators=[DataRequired()])
     
     end_lat = FloatField('End Latitude',
-                         default=40.7395441,
+                         default=40.7512341,
                          validators=[DataRequired()])
     end_long = FloatField('End Longitude',
-                          default=-73.9885504,
+                          default=-73.9829001,
                           validators=[DataRequired()])
