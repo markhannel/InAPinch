@@ -14,8 +14,9 @@
 <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js"
 	integrity="sha512-zdT4Pc2tIrc6uoYly2Wp8jh6EPEWaveqqD3sT0lf5yei19BC1WulGuh5CesB0ldBKZieKGD7Qyf/G0jdSe016A=="
 	crossorigin=""></script>
-
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 <style>
+  
   .extendfull, .extendleft
   {
   padding-left: 100px;
@@ -37,53 +38,90 @@
   font-size:18px;
   }
 
+  html, body {
+  width: 100%;
+  }
+
+  .button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  }
   
+  .button:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  }
+
+  .newcontainer {
+  @extend.container;
+  display: flex;
+  }
+
+  .newcontainer.space-between {  
+  justify-content: space-between;
+  font-size: 22px;
+  width: 95%;
+  align: center;
+  }
+
+  table, td, th {
+  font-size: 22px;
+  }
+
+  .custom .leaflet-popup-content-wrapper {
+  font-size:18px;
+}
 </style>
-<p>
 
-</p>
-<div class="container-fluid">
+<div class="container">
   
-  <div class="row">
-    <div class="col-sm-6">
-      <div id="map" class="extendleft" style="height: 20%;"></div>
-    </div>
-    <div class="col-sm-6">
-      
-      <p>
 	<h1 align="center" class="space-title"> In-A-Pinch</h1>
-      </p>
-
       <p>
 	<h4 align="center">Reliably predicting bike and dock availability <br />for sensible Citi Bike route planning.</h4>
 	</p>
-      <p class="space-above">
-      <form action="#" method="post">
-	
-	{{ form.hidden_tag() }}
-	<input type="hidden" id="start_lat" name="start_lat"></input>
-	<input type="hidden" id="start_long" name="start_long"></input>
-	<input type="hidden" id="end_lat" name="end_lat"></input>
-	<input type="hidden" id="end_long" name="end_long"></input>
-	
-	<input type="hidden" id="destination_latlng"></input>
-	<!--
-	<p>
-	  Start Date: {{ form.dt(class='datepicker') }}
-	</p>
-	
-	<p>
-	      Start Time: {{ form.start_time }}
-	</p>
-	-->
-	<p>
-	  <input type="submit"/>
-	  </p>
-      </form>
-    </div>
-  </p>
-    </div>
   </div>
+
+
+
+<div class="container">
+  <div id="map" style="height: 700px;"></div>
+</div>
+
+
+<div class="container" align="center">
+    <form action="#" method="post">
+      
+      {{ form.hidden_tag() }}
+      <input type="hidden" id="start_lat" name="start_lat"></input>
+      <input type="hidden" id="start_long" name="start_long"></input>
+      <input type="hidden" id="end_lat" name="end_lat"></input>
+      <input type="hidden" id="end_long" name="end_long"></input>
+      
+      <input type="hidden" id="destination_latlng"></input>
+      <!--
+	  <p>
+	    Start Date: {{ form.dt(class='datepicker') }}
+	  </p>
+	  
+      <p>
+	Start Time: {{ form.start_time }}
+      </p>
+      -->
+      {% if answer == 'none' %}
+      <div class="space-above">
+	<input type="submit" class="button"/>
+      </div>
+      {% endif %}
+    </form>
 </div>
 
 <script type="text/javascript">
@@ -126,7 +164,6 @@
   function resultsToHiddenField(variable, result){
   var s = document.getElementById(variable);
   s.value = result;
-  console.log(s.value);
   }   
   
   // Search events.
@@ -155,13 +192,13 @@
   {% if answer != 'none' %}
   // Start station marker.
   var marker1 = L.marker([{{ start.lat }}, {{ start.long }}]).addTo(map);
-  marker1.bindPopup("In 7 mins...<br><b>Bikes: {{ start.bikes_avail_future }}</b><br>Docks: {{ start.docks_avail_future }}",  {closeOnClick: false,
-  autoClose: false}).openPopup();
+  marker1.bindPopup("<b>Bikes: {{ start.bikes_avail_future }}</b><br>Docks: {{ start.docks_avail_future }}",  {closeOnClick: false,
+  autoClose: false, className:'custom'}).openPopup();
   
   // End station marker.
   var marker = L.marker([{{ end.lat }}, {{ end.long }}]).addTo(map);
-  marker.bindPopup("In 49 mins...<br>Bikes: {{ end.bikes_avail_future }}<br><b>Docks: {{ end.docks_avail_future }}</b>",  {closeOnClick: false,
-  autoClose: false}).openPopup();
+  marker.bindPopup("Bikes: {{ end.bikes_avail_future }}<br><b>Docks: {{ end.docks_avail_future }}</b>",  {closeOnClick: false,
+  autoClose: false, className:'custom'}).openPopup();
 
   // Walking to station route.
   var stationpolyline = new L.Polyline({{ first_leg.polylines }}, {
@@ -197,8 +234,60 @@
   {% endif %}
   </script>
   </p>
-</div>  
+</div>
+
 {% if answer != 'none' %}
+
+
+
+<div class="container">
+  <div id="accordion">
+    <div class="card border-secondary mb-3">
+      <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+	<div class="newcontainer space-between">
+	<div> Route </div>
+	<div id="eta"></div>
+	<div> <i class="fas fa-ship" style="color: blue"></i> 98% </div>
+	</div>
+      </div>
+      
+      <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+	<div class="card-body">
+	  
+	  <table style="width:98%" align="center">
+	    <tr>
+	      <th>Direction</th>
+	      <th>Expected time</th>
+	      <th></th>
+	      <th>Now</th>
+	      <th>Then</th>
+	    </tr>
+	    <tr>
+	      <td>Walk to the station at {{ start.name }}</td>
+	      <td id="walk_to_station"></td>
+	      <td>Bike Availability</td>
+	      <td>{{ start.bikes_avail }}</td>
+	      <td>{{ start.bikes_avail_future }}</td>
+	    </tr>
+	    <tr>
+	      <td>Bike to the station at {{ end.name }}</td>
+	      <td id="bike_to_station"></td>
+	      <td>Dock Availability</td>
+	      <td>{{ end.docks_avail }}</td>
+	      <td>{{ end.docks_avail_future }}</td>
+	    </tr>
+	    <tr>
+	      <td>Walk to your final location.</td>
+	      <td id="walk_to_destination"></td>
+	      <td></td>
+	      <td></td>
+	    </tr>
+	  </table>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <div class="space-above">
@@ -206,54 +295,35 @@
       <span id="valBox"></span>
       <input type="range" min="5" max="10" step="1" 
 	     oninput="showVal(this.value)" onchange="showVal(this.value)"> -->
-      </div>
-<table style="width:80%" align="center">
-  <tr>
-    <th>Direction</th>
-    <th>Expected time</th>
-    <th></th>
-    <th>Now</th>
-    <th>Then</th>
-  </tr>
-  <tr>
-    <td>Walk to the citibike station at {{ start.name }}</td>
-    <td id="walk_to_station"></td>
-    <td>Bike Availability</td>
-    <td>{{ start.bikes_avail }}</td>
-    <td>{{ start.bikes_avail_future }}</td>
-  </tr>
-  <tr>
-    <td>Bike to the citibike station at {{ end.name }}</td>
-    <td id="bike_to_station"></td>
-    <td>Dock Availability</td>
-    <td>{{ end.docks_avail }}</td>
-    <td>{{ end.docks_avail_future }}</td>
-  </tr>
-  <tr>
-    <td>Walk to your final location.</td>
-    <td id="walk_to_destination"></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td align="right">Total Time: &nbsp;</td>
-    <td id="total_duration"></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
+</div>
+
 
 
 <script type="text/javascript">
   function time(variable, duration){
-      var s = document.getElementById(variable);
-      s.innerHTML = moment().startOf('day').seconds(duration).format('H:mm:ss');
+  var s = document.getElementById(variable);
+  var t = moment().startOf('day').seconds(duration);
+  if (t > 3600){
+      s.innerHTML = t.format('H:mm:ss');
+  } else {
+      s.innerHTML = t.format('mm:ss');
+  }
+  }
+
+  function setETA(duration){
+  var s = document.getElementById("eta");
+  s.innerHTML = "ETA: " + duration + " mins";
+  }
+  
+  function getminutes(duration){
+  var t = moment().startOf('day').seconds(duration);
+  return (t.hour()*60) + t.minutes();
   }
 
   time("walk_to_station", {{ first_leg.duration }} );
   time("bike_to_station", {{ second_leg.duration }} );
   time("walk_to_destination", {{ third_leg.duration }} );
-  time("total_duration", {{ first_leg.duration }}  + {{ second_leg.duration }} + {{ third_leg.duration }} );
+  setETA( getminutes({{ first_leg.duration }}  + {{ second_leg.duration }} + {{ third_leg.duration }}) );
 </script>
 
 
