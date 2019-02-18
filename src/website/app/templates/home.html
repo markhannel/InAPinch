@@ -236,16 +236,17 @@
 </table>
 
 
-
+w
 <script type="text/javascript">
   function time(variable, duration){
       var s = document.getElementById(variable);
       s.innerHTML = moment().startOf('day').seconds(duration).format('H:mm:ss');
   }
+
   time("walk_to_station", {{ first_leg.duration }} );
-  time("bike_to_station", {{ second_leg.duration }}*3./8);
+  time("bike_to_station", {{ second_leg.duration }} );
   time("walk_to_destination", {{ third_leg.duration }} );
-  time("total_duration", {{ first_leg.duration }}  + {{ second_leg.duration }}*3./8 + {{ third_leg.duration }} );
+  time("total_duration", {{ first_leg.duration }}  + {{ second_leg.duration }} + {{ third_leg.duration }} );
 </script>
 
 

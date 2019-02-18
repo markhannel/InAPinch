@@ -48,7 +48,7 @@ class Directions(object):
         self.polylines = extract_polylines(self.directions)
     
 
-def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5000}):
+def get_directions(start, end, mode, modes={'foot':5000, 'cycle':5002}):
     url = "http://127.0.0.1:{}/route/v1/{}/{},{};{},{}?steps=true"
     url = url.format(modes[mode], mode,
                      start[0], start[1], 
@@ -196,7 +196,7 @@ def main():
     start_coords = [-73.959066, 40.677537]
     end_coords = [-73.9885504, 40.7395441]
 
-    dirs = get_directions(start_coords, end_coords, 'foot')
+    dirs = get_directions(start_coords, end_coords, 'cycle')
     print(extract_polylines(dirs))
 
     
