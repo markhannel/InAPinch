@@ -38,47 +38,50 @@ def home():
                              [form.end_lat.data,
                               form.end_long.data])
 
-
-
-        # Station information.
-        start = Station()
-        start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
-        start.long = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
-        start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
-        start.bikes_avail = station_update.query('station_id == "{}"'.format(r[1])).num_bikes_available.values[0]
-        start.docks_avail = station_update.query('station_id == "{}"'.format(r[1])).num_docks_available.values[0]
-
-        # Naive Model.
-        start.bikes_avail_future = start.bikes_avail
-        start.docks_avail_future = start.docks_avail
+        if len(r) > 2:
+            # Station information.
+            start = Station()
+            start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
+            start.long = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
+            start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
+            start.bikes_avail = station_update.query('station_id == "{}"'.format(r[1])).num_bikes_available.values[0]
+            start.docks_avail = station_update.query('station_id == "{}"'.format(r[1])).num_docks_available.values[0]
+            
+            # Naive Model.
+            start.bikes_avail_future = start.bikes_avail
+            start.docks_avail_future = start.docks_avail
+            
         
-
-        end = Station()
-        end.lat  = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
-        end.long = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
-        end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
-        end.docks_avail = station_update.query('station_id == "{}"'.format(r[2])).num_docks_available.values[0]
-        end.bikes_avail = station_update.query('station_id == "{}"'.format(r[2])).num_bikes_available.values[0]
-
-        # Naive model.
-        end.bikes_avail_future = end.bikes_avail
-        end.docks_avail_future = end.docks_avail
-
+            end = Station()
+            end.lat  = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
+            end.long = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
+            end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
+            end.docks_avail = station_update.query('station_id == "{}"'.format(r[2])).num_docks_available.values[0]
+            end.bikes_avail = station_update.query('station_id == "{}"'.format(r[2])).num_bikes_available.values[0]
         
-        # Directions.
-        first_leg = Directions([form.start_long.data, form.start_lat.data],
-                               [start.long, start.lat], mode='foot')
-        second_leg = Directions([start.long, start.lat], [end.long, end.lat],
-                                mode='cycle')
-        third_leg = Directions([end.long, end.lat], [form.end_long.data, form.end_lat.data],
-                               mode='foot')
-        
-        # Render template with stations and directions.
-        return render_template('home.html', form=form, answer=True,
-                               start=start, end=end,
-                               first_leg=first_leg,
-                               second_leg=second_leg,
-                               third_leg=third_leg)
+            # Naive model.
+            end.bikes_avail_future = end.bikes_avail
+            end.docks_avail_future = end.docks_avail
+            
+            
+            # Directions.
+            first_leg = Directions([form.start_long.data, form.start_lat.data],
+                                   [start.long, start.lat], mode='foot')
+            second_leg = Directions([start.long, start.lat], [end.long, end.lat],
+                                    mode='cycle')
+            third_leg = Directions([end.long, end.lat], [form.end_long.data, form.end_lat.data],
+                                   mode='foot')
+            
+            # Render template with stations and directions.
+            return render_template('home.html', form=form, answer=True,
+                                   start=start, end=end,
+                                   first_leg=first_leg,
+                                   second_leg=second_leg,
+                                   third_leg=third_leg)
+
+        else:
+            # Walking directions.
+            return render_template('home.html', form=form, answer='none')
     
     return render_template('home.html', form=form, answer='none')
 
