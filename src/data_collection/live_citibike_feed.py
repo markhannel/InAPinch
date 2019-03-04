@@ -74,13 +74,9 @@ def main():
         print("Connected!")
 
         # Create Table.
-        cursor.execute(CREATION_CMD)
-        print("Table created!")
-        
-
-
-
-        
+        #cursor.execute(CREATION_CMD)
+        #print("Table created!")
+                
         starttime=time.time()
         while True:
             print('Pinging citibike.')
@@ -111,7 +107,7 @@ def main():
                                           station['datetime']))
 
             try:
-                time.sleep(10.0 - ((time.time() - starttime) % 10.0))
+                time.sleep(60.0 - ((time.time() - starttime) % 60.0))
             except KeyboardInterrupt:
                 raise 
         
