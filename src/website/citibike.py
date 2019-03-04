@@ -6,18 +6,46 @@ citibike_only returns a set of citibke stations given two sets of geocoordinates
 """
 
 import pandas as pd
+import numpy as np
 from scipy.spatial import KDTree
 from collections import defaultdict
 import requests
 import json
+from scipy.linalg import expm
+from scipy import sparse
+import pickle
 
 FN = '~/inapinch/data/citibike/citibike_stations.csv'
 ROUTES_FN = '~/inapinch/data/citibike/all_stations_durations_docks.csv'
 
+def time_intervals(h, timeleft=1.0):
+    ''' Returns a list of times spent in 15 minute intervals over the next h minutes.
+    timeleft allows you to set the amount of time left in the first 15 minute interval.
+    '''
+    time = [timeleft]
+    h -= timeleft*15
+    if h < 0:
+        return time
+
+    while h>0:
+        if h < 15:
+            time.append(h/15)
+        else:
+            time.append(1.0)
+        h -= 15
+        
+    if time[0] < 0.01:
+        time = time[1:]
+    if time[-1] < 0.01:
+        time = time[:-1]
+
+    return time
+
 class Station(object):
     """Station class provides a concise way to organize station data.
     """
-    def __init__(self):
+    def __init__(self, stat_id):
+        self.id = float(stat_id)
         self.lat = None
         self.long = None
         self.name = None
@@ -26,6 +54,61 @@ class Station(object):
         self.active = True
         self.bikes_disabled = None
         self.docks_disabled = None
+
+    def predict_no_bikes(self, interval, h, temp=30, weekend=0, raining=0, timeleft=1.0):
+        ''' Given the number of bikes at a station on a specific 
+        15 minute interval of a day, return the following for h minutes
+        in the future:
+
+        prob_a_bike: probability of at least one bike.
+        expected_bikes: expected number of bikes.
+        prob_a_dock: probability of at least one dock.
+        expected_docks: expected number of docks.
+        '''
+
+        num_bikes = self.bikes_avail
+        total_docks = self.bikes_avail + self.docks_avail
+
+        # Make the prediction about the number 
+        # Load the necessary predictors.
+        with open('../../models/lambda_and_mu/stationid_{}_lambda.pkl'.format(int(self.id)), 'rb') as f:
+            lamb_func = pickle.load(f)
+
+        with open('../../models/lambda_and_mu/stationid_{}_mu.pkl'.format(int(self.id)), 'rb') as f:
+            mu_func = pickle.load(f)
+
+        # Find the average flux over the next 15 minutes.
+        kernel = sparse.diags([0]*(total_docks+1))
+        self.mus = []
+        self.lambs = []
+        #for time in time_intervals(h, timeleft):
+        for time in [1, 1]:
+            lamb = lamb_func.predict([[interval, weekend, temp, raining]])[0]
+            mu = mu_func.predict([[interval, weekend, temp, raining]])[0]
+            self.mus.append(mu)
+            self.lambs.append(lamb)
+            
+            # Construct the transition kernel.
+            upper_diag = mu * np.ones(total_docks)
+            lower_diag = lamb * np.ones(total_docks)
+            diag = np.zeros(total_docks+1)
+            diag[:-1] -= upper_diag*time
+            diag[1:]  -= lower_diag*time
+            kernel += sparse.diags([diag, upper_diag, lower_diag], [0, 1, -1])
+
+            interval += 1 
+        prob = expm(kernel.toarray())
+        self.prob = prob
+        bikes = np.sum(prob[num_bikes,:]*np.arange(total_docks+1))
+        docks = total_docks - bikes
+        self.at_least_one_bike = sum(prob[num_bikes, 1:])
+        self.bikes_avail_future = np.round(bikes)
+        self.at_least_one_dock = sum(prob[num_bikes, :-1])
+        self.docks_avail_future = np.round(docks)
+        self.total_prob = self.at_least_one_bike * self.at_least_one_dock
+
+        self.total_prob = min(self.total_prob, 0.98)
+        self.total_prob = max(self.total_prob, 0.02)
 
 class Directions(object):
     """ Directions class provides a concise way to organize direction
@@ -205,6 +288,53 @@ def main():
     end_coords = [40.7006181,-73.9607287]
     start_coords = [40.7184878,-73.9927139]
     #print(sr.start_to_end(start_coords, end_coords))
+
+def test_predict_no_bikes(num_bikes, total_docks, interval, h, station, raining=0.0,
+                         temp=30, weekend=0, timeleft=1.0):
+    ''' Given the number of bikes at a station on a specific 
+    15 minute interval of a day, return the following for h minutes
+    in the future:
+    prob_a_bike: probability of at least one bike.
+    expected_bikes: expected number of bikes.
+    prob_a_dock: probability of at least one dock.
+    expected_docks: expected number of docks.
+    '''
+    # Make the prediction about the number 
+    # Load the necessary predictors.
+    with open('../../models/lambda_and_mu/stationid_{}_lambda.pkl'.format(int(station)), 'rb') as f:
+        lamb_func = pickle.load(f)
     
+    with open('../../models/lambda_and_mu/stationid_{}_mu.pkl'.format(int(station)), 'rb') as f:
+        mu_func = pickle.load(f)
+        
+    # Find the average flux over the next 15 minutes.
+    kernel = sparse.diags([0]*(total_docks+1))
+    for time in time_intervals(h, timeleft): # FIXME: Use timeleft
+        lamb = lamb_func.predict([[interval, weekend, temp, raining]])[0]
+        mu = mu_func.predict([[interval, weekend, temp, raining]])[0]
+    
+        # Construct the transition kernel.
+        upper_diag = mu * np.ones(total_docks)
+        lower_diag = lamb * np.ones(total_docks)
+        diag = np.zeros(total_docks+1)
+        diag[:-1] -= upper_diag*time
+        diag[1:]  -= lower_diag*time
+        kernel += sparse.diags([diag, upper_diag, lower_diag], [0, 1, -1])
+        
+        interval += 1 
+    prob = expm(kernel.toarray())
+    bikes = np.sum(prob[num_bikes,:]*np.arange(total_docks+1))
+    docks = total_docks - bikes
+    return sum(prob[num_bikes, 1:]), bikes, sum(prob[num_bikes, :-1]), docks
+
 if __name__ == '__main__':
-    main()
+    #main()
+    print(time_intervals(51, 0.53333))
+    
+    print(test_predict_no_bikes(num_bikes=10, 
+                                total_docks=18, 
+                                interval=40, 
+                                h=45, 
+                                station=264.0))
+    
+

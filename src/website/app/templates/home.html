@@ -192,12 +192,12 @@
   {% if answer != 'none' %}
   // Start station marker.
   var marker1 = L.marker([{{ start.lat }}, {{ start.long }}]).addTo(map);
-  marker1.bindPopup("<b>Bikes: {{ start.bikes_avail_future }}</b><br>Docks: {{ start.docks_avail_future }}",  {closeOnClick: false,
+  marker1.bindPopup("<b>Bikes: {{ start.bikes_avail_future | round }}</b><br>Docks: {{ start.docks_avail_future }}",  {closeOnClick: false,
   autoClose: false, className:'custom'}).openPopup();
   
   // End station marker.
   var marker = L.marker([{{ end.lat }}, {{ end.long }}]).addTo(map);
-  marker.bindPopup("Bikes: {{ end.bikes_avail_future }}<br><b>Docks: {{ end.docks_avail_future }}</b>",  {closeOnClick: false,
+  marker.bindPopup("Bikes: {{ end.bikes_avail_future }}<br><b>Docks: {{ end.docks_avail_future | round }}</b>",  {closeOnClick: false,
   autoClose: false, className:'custom'}).openPopup();
 
   // Walking to station route.
@@ -247,7 +247,7 @@
 	<div class="newcontainer space-between">
 	<div> Route </div>
 	<div id="eta"></div>
-	<div> <i class="fas fa-ship" style="color: blue"></i> 98% </div>
+	<div> <i class="fas fa-ship" style="color: blue"></i> {{ total_prob | round}}%</div>
 	</div>
       </div>
       
@@ -267,14 +267,14 @@
 	      <td id="walk_to_station"></td>
 	      <td>Bike Availability</td>
 	      <td>{{ start.bikes_avail }}</td>
-	      <td>{{ start.bikes_avail_future }}</td>
+	      <td>{{ start.bikes_avail_future | round }}</td>
 	    </tr>
 	    <tr>
 	      <td>Bike to the station at {{ end.name }}</td>
 	      <td id="bike_to_station"></td>
 	      <td>Dock Availability</td>
 	      <td>{{ end.docks_avail }}</td>
-	      <td>{{ end.docks_avail_future }}</td>
+	      <td>{{ end.docks_avail_future | round }}</td>
 	    </tr>
 	    <tr>
 	      <td>Walk to your final location.</td>

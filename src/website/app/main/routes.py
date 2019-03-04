@@ -6,10 +6,11 @@ from wtforms import FloatField
 from wtforms_components import TimeField
 from wtforms.validators import DataRequired
 from app.main import bp
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from citibike import SearchRoutes, Station, Directions
 import pandas as pd
+from flask import current_app
 
 # Global variables for route information.
 CB_INFO_URL = "https://gbfs.citibikenyc.com/gbfs/es/station_information.json"
@@ -40,7 +41,7 @@ def home():
 
         if len(r) > 2:
             # Station information.
-            start = Station()
+            start = Station(r[1])
             start.lat  = STATION_INFO.query('station_id == "{}"'.format(r[1])).lat.values[0]
             start.long = STATION_INFO.query('station_id == "{}"'.format(r[1])).lon.values[0]
             start.name = STATION_INFO.query('station_id == "{}"'.format(r[1])).name.values[0]
@@ -50,9 +51,8 @@ def home():
             # Naive Model.
             start.bikes_avail_future = start.bikes_avail
             start.docks_avail_future = start.docks_avail
-            
         
-            end = Station()
+            end = Station(r[2])
             end.lat  = STATION_INFO.query('station_id == "{}"'.format(r[2])).lat.values[0]
             end.long = STATION_INFO.query('station_id == "{}"'.format(r[2])).lon.values[0]
             end.name = STATION_INFO.query('station_id == "{}"'.format(r[2])).name.values[0]
@@ -71,13 +71,34 @@ def home():
                                     mode='cycle')
             third_leg = Directions([end.long, end.lat], [form.end_long.data, form.end_lat.data],
                                    mode='foot')
+
+            # Feeding the prediction engine.
+            current_time = datetime.utcnow() - timedelta(hours=5)
+            current_interval = (current_time.hour*60 + current_time.minute)//15
+            time_left_first_interval = ((current_time.hour*60 + current_time.minute) % 15)/15
+            time_to_rental = first_leg.duration//60
+            time_to_return = (first_leg.duration + second_leg.duration)//60
+            weekend = current_time.weekday()//5
+            
+            start.predict_no_bikes(current_interval, time_to_rental, weekend=weekend,
+                                   timeleft = 0, raining=0.0)
+            
+            end.predict_no_bikes(current_interval, time_to_return, weekend=weekend,
+                                 timeleft = 0, raining=0.0)
+
+            total_prob = end.at_least_one_dock * start.at_least_one_bike * 100
+            total_prob = min(total_prob, 99)
+            total_prob = max(total_prob, 1)
+
+            end.bikes_avail_future = round(end.bikes_avail_future)
             
             # Render template with stations and directions.
             return render_template('home.html', form=form, answer=True,
                                    start=start, end=end,
                                    first_leg=first_leg,
                                    second_leg=second_leg,
-                                   third_leg=third_leg)
+                                   third_leg=third_leg,
+                                   total_prob=total_prob)
 
         else:
             # Walking directions.
